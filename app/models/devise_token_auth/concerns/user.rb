@@ -1,5 +1,3 @@
-require 'bcrypt'
-
 module DeviseTokenAuth::Concerns::User
   extend ActiveSupport::Concern
 
@@ -7,7 +5,7 @@ module DeviseTokenAuth::Concerns::User
     @token_equality_cache ||= {}
 
     key = "#{token_hash}/#{token}"
-    result = @token_equality_cache[key] ||= (Digest::MD5.hexdigest(token_hash) == token)
+    result = @token_equality_cache[key] ||= (Digest::MD5.hexdigest(token) == token_hash)
     if @token_equality_cache.size > 10000
       @token_equality_cache = {}
     end
@@ -168,7 +166,7 @@ module DeviseTokenAuth::Concerns::User
     client_id  ||= SecureRandom.urlsafe_base64(nil, false)
     last_token ||= nil
     token        = SecureRandom.urlsafe_base64(nil, false)
-    token_hash   = ::BCrypt::Password.create(token)
+    token_hash   = Digest::MD5.hexdigest(token)
     expiry       = (Time.now + DeviseTokenAuth.token_lifespan).to_i
 
     if self.tokens[client_id] and self.tokens[client_id]['token']

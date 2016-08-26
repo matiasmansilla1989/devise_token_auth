@@ -134,7 +134,7 @@ module DeviseTokenAuth
       render json: {
         status: 'error',
         data:   @resource.as_json,
-        errors: @resource.errors.to_hash.merge(full_messages: @resource.errors.full_messages)
+        errors: @resource.errors.to_hash.merge(full_messages: @resource.errors.values[0])
       }, status: 403
     end
 

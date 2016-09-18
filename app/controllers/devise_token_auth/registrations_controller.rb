@@ -131,10 +131,19 @@ module DeviseTokenAuth
     end
 
     def render_create_error
+      errors = if @resource.errors.key?(:password_confirmation)
+        @resource.errors[:password_confirmation]
+      elsif @resource.errors.key?(:password)
+        @resource.errors[:password]
+      elsif @resource.errors.key?(:username)
+        [@resource.errors.full_messages_for(:username)[0].sub!('Username', 'Nombre de usuario')]
+      else
+        @resource.errors.full_messages
+      end
       render json: {
         status: 'error',
         data:   @resource.as_json,
-        errors: @resource.errors.to_hash.merge(full_messages: @resource.errors.values[0])
+        errors: { full_messages: errors },
       }, status: 403
     end
 
